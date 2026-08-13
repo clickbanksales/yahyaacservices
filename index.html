@@ -89,8 +89,20 @@
       0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); }
     }
 
-    .mobile-nav-active { max-height: 340px; opacity: 1; }
-    .mobile-nav-closed { max-height: 0; opacity: 0; }
+    /* Nav underline + scrollspy active state */
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: ""; position: absolute; left: 0; right: 100%; bottom: -4px; height: 2px;
+      background: #EA6C0E; border-radius: 2px; transition: right .25s ease;
+    }
+    .nav-link:hover::after, .nav-link.active::after { right: 0; }
+    .nav-link.active { color: #0F1F38; font-weight: 600; }
+
+    /* Mobile drawer */
+    #mobile-drawer { transition: transform .35s cubic-bezier(.4,0,.2,1); }
+    #mobile-drawer.drawer-closed { transform: translateX(100%); }
+    #drawer-backdrop { transition: opacity .3s ease; }
+    #drawer-backdrop.backdrop-hidden { opacity: 0; pointer-events: none; }
 
     /* Scroll-reveal */
     .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
@@ -101,8 +113,10 @@
 
     .step-line { background: repeating-linear-gradient(90deg, #EA6C0E 0, #EA6C0E 10px, transparent 10px, transparent 18px); }
 
-    /* Keep anchored sections clear of the fixed header */
-    section[id] { scroll-margin-top: 5.5rem; }
+    /* Keep anchored sections clear of the fixed header (+ utility bar from sm up) */
+    section[id] { scroll-margin-top: 4.5rem; }
+    @media (min-width: 640px) { section[id] { scroll-margin-top: 6.5rem; } }
+    @media (min-width: 768px) { section[id] { scroll-margin-top: 7.5rem; } }
 
     /* Faint grain so flat color fields don't read as generic vector fills */
     .grain { position: relative; isolation: isolate; }
@@ -136,60 +150,116 @@
 </head>
 <body class="bg-cream font-sans text-slate-800 antialiased pb-16 lg:pb-0">
 
+  <!-- Top utility bar -->
+  <div class="hidden sm:block fixed top-0 inset-x-0 z-50 bg-navy-950 text-white/75 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-9 flex items-center justify-between gap-4">
+      <p class="flex items-center gap-2 truncate">
+        <svg class="w-3.5 h-3.5 text-ember-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="truncate">Open 24/7 for AC &amp; electrical emergencies</span>
+      </p>
+      <div class="flex items-center gap-4 md:gap-5 flex-shrink-0">
+        <span class="hidden md:flex items-center gap-1.5 text-ember-400 font-semibold">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          4.9 · 500+ reviews
+        </span>
+        <a href="mailto:yahyagirami@gmail.com" class="hidden lg:inline hover:text-white transition-colors">yahyagirami@gmail.com</a>
+        <a href="tel:+919953558218" class="hover:text-white transition-colors font-medium">+91 99535 58218</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Navigation -->
-  <header id="site-header" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md transition-shadow duration-300">
+  <header id="site-header" class="fixed inset-x-0 top-0 sm:top-9 z-50 bg-white/95 backdrop-blur-md transition-shadow duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16 md:h-20">
+      <div class="flex justify-between items-center gap-4 h-16 md:h-20">
         <a href="#top" class="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
           <img src="yahya.png" alt="Yahya AC Services logo" width="56" height="55" class="w-12 h-12 md:w-14 md:h-14 object-contain flex-shrink-0">
-          <span class="hidden sm:block leading-tight">
-            <span class="block font-display font-bold text-navy-900 text-base md:text-lg">Yahya AC Services</span>
-            <span class="block text-xs text-slate-500">Bogal, New Delhi</span>
+          <span class="hidden sm:block leading-tight min-w-0">
+            <span class="block font-display font-bold text-navy-900 text-base md:text-lg whitespace-nowrap">Yahya AC Services</span>
+            <span class="hidden xl:block text-xs text-slate-500 whitespace-nowrap">Bogal, New Delhi</span>
           </span>
         </a>
 
-        <nav class="hidden lg:flex items-center gap-7" aria-label="Primary">
-          <a href="#services" class="text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">Services</a>
-          <a href="#process" class="text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">How It Works</a>
-          <a href="#about" class="text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">About</a>
-          <a href="#reviews" class="text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">Reviews</a>
-          <a href="#faq" class="text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">FAQ</a>
-          <a href="#contact" class="text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">Contact</a>
+        <nav class="hidden lg:flex items-center gap-5 xl:gap-7" aria-label="Primary">
+          <a href="#services" data-nav-link="services" class="nav-link pb-1 text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">Services</a>
+          <a href="#process" data-nav-link="process" class="nav-link pb-1 text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">How It Works</a>
+          <a href="#about" data-nav-link="about" class="nav-link pb-1 text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">About</a>
+          <a href="#reviews" data-nav-link="reviews" class="nav-link pb-1 text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">Reviews</a>
+          <a href="#faq" data-nav-link="faq" class="nav-link pb-1 text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">FAQ</a>
+          <a href="#contact" data-nav-link="contact" class="nav-link pb-1 text-slate-600 hover:text-navy-900 font-medium text-sm transition-colors">Contact</a>
         </nav>
 
         <div class="flex items-center gap-2 md:gap-3">
-          <button id="mobile-menu-btn" class="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+          <button id="mobile-menu-btn" class="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-drawer">
             <svg class="w-6 h-6 text-navy-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
-          <a href="tel:+919953558218" class="hidden md:flex items-center gap-2 text-navy-900 font-semibold hover:text-ember-600 transition-colors text-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          <a href="tel:+919953558218" class="hidden md:inline-flex items-center gap-2 border border-navy-900/15 hover:border-navy-900/30 hover:bg-navy-900/[0.03] text-navy-900 font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
             <span>+91 99535 58218</span>
           </a>
-          <a href="https://wa.me/919953558218" target="_blank" rel="noopener noreferrer" aria-label="Message on WhatsApp" class="bg-[#25D366] hover:bg-[#1EBE5A] text-white px-3 md:px-4 py-2 md:py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all text-xs md:text-sm shadow-sm">
+          <a href="https://wa.me/919953558218" target="_blank" rel="noopener noreferrer" aria-label="Message on WhatsApp" class="bg-[#25D366] hover:bg-[#1EBE5A] text-white px-3 md:px-4 py-2 md:py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all text-xs md:text-sm shadow-sm hover:shadow-md hover:-translate-y-px">
             <svg class="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             <span class="hidden sm:inline">WhatsApp</span>
           </a>
         </div>
       </div>
-
-      <!-- Mobile Menu -->
-      <div id="mobile-menu" class="mobile-nav-closed lg:hidden overflow-hidden transition-all duration-300 bg-white border-t border-slate-100">
-        <div class="px-4 py-4 space-y-1">
-          <a href="#services" class="mobile-link block px-4 py-2 rounded-lg hover:bg-slate-100 font-medium text-slate-600 text-sm">Services</a>
-          <a href="#process" class="mobile-link block px-4 py-2 rounded-lg hover:bg-slate-100 font-medium text-slate-600 text-sm">How It Works</a>
-          <a href="#about" class="mobile-link block px-4 py-2 rounded-lg hover:bg-slate-100 font-medium text-slate-600 text-sm">About</a>
-          <a href="#reviews" class="mobile-link block px-4 py-2 rounded-lg hover:bg-slate-100 font-medium text-slate-600 text-sm">Reviews</a>
-          <a href="#faq" class="mobile-link block px-4 py-2 rounded-lg hover:bg-slate-100 font-medium text-slate-600 text-sm">FAQ</a>
-          <a href="#contact" class="mobile-link block px-4 py-2 rounded-lg hover:bg-slate-100 font-medium text-slate-600 text-sm">Contact</a>
-          <hr class="my-2 border-slate-100">
-          <a href="tel:+919953558218" class="flex items-center justify-center gap-3 px-4 py-3 bg-navy-900 text-white rounded-lg font-semibold active:scale-95 transition-all text-sm">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-            Call Now
-          </a>
-        </div>
-      </div>
     </div>
   </header>
+
+  <!-- Mobile drawer backdrop -->
+  <div id="drawer-backdrop" class="backdrop-hidden fixed inset-0 z-[60] bg-navy-950/50 lg:hidden" aria-hidden="true"></div>
+
+  <!-- Mobile drawer -->
+  <div id="mobile-drawer" class="drawer-closed fixed top-0 right-0 z-[70] h-full w-[85%] max-w-xs bg-white shadow-2xl lg:hidden flex flex-col" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="flex items-center justify-between px-5 h-16 border-b border-slate-100 flex-shrink-0">
+      <span class="flex items-center gap-2.5 min-w-0">
+        <img src="yahya.png" alt="" class="w-9 h-9 object-contain flex-shrink-0">
+        <span class="font-display font-bold text-navy-900 text-sm truncate">Yahya AC Services</span>
+      </span>
+      <button id="drawer-close-btn" aria-label="Close menu" class="p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0">
+        <svg class="w-5 h-5 text-navy-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 py-3 space-y-0.5" aria-label="Mobile">
+      <a href="#services" class="drawer-link flex items-center justify-between px-3 py-3.5 rounded-xl hover:bg-cream font-semibold text-navy-900 text-sm transition-colors">
+        Services
+        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#process" class="drawer-link flex items-center justify-between px-3 py-3.5 rounded-xl hover:bg-cream font-semibold text-navy-900 text-sm transition-colors">
+        How It Works
+        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#about" class="drawer-link flex items-center justify-between px-3 py-3.5 rounded-xl hover:bg-cream font-semibold text-navy-900 text-sm transition-colors">
+        About
+        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#reviews" class="drawer-link flex items-center justify-between px-3 py-3.5 rounded-xl hover:bg-cream font-semibold text-navy-900 text-sm transition-colors">
+        Reviews
+        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#faq" class="drawer-link flex items-center justify-between px-3 py-3.5 rounded-xl hover:bg-cream font-semibold text-navy-900 text-sm transition-colors">
+        FAQ
+        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#contact" class="drawer-link flex items-center justify-between px-3 py-3.5 rounded-xl hover:bg-cream font-semibold text-navy-900 text-sm transition-colors">
+        Contact
+        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </nav>
+
+    <div class="px-5 py-5 border-t border-slate-100 space-y-3 flex-shrink-0">
+      <a href="tel:+919953558218" class="flex items-center justify-center gap-2 w-full bg-navy-900 text-white font-bold py-3.5 rounded-xl text-sm active:scale-95 transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+        Call Now
+      </a>
+      <a href="https://wa.me/919953558218" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full bg-[#25D366] text-white font-bold py-3.5 rounded-xl text-sm active:scale-95 transition-all">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+      <p class="text-center text-xs text-slate-400 pt-1">Bogal, New Delhi · Available 24/7</p>
+    </div>
+  </div>
 
   <div id="top"></div>
 
@@ -973,21 +1043,30 @@
     toggleHeaderShadow();
     window.addEventListener('scroll', toggleHeaderShadow, { passive: true });
 
-    // Mobile menu toggle
+    // Mobile drawer menu
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    mobileMenuBtn.addEventListener('click', function () {
-      const isOpen = mobileMenu.classList.toggle('mobile-nav-active');
-      mobileMenu.classList.toggle('mobile-nav-closed');
-      mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
-    });
-    mobileMenu.querySelectorAll('.mobile-link').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileMenu.classList.add('mobile-nav-closed');
-        mobileMenu.classList.remove('mobile-nav-active');
-        mobileMenuBtn.setAttribute('aria-expanded', 'false');
-      });
-    });
+    const drawer = document.getElementById('mobile-drawer');
+    const drawerBackdrop = document.getElementById('drawer-backdrop');
+    const drawerCloseBtn = document.getElementById('drawer-close-btn');
+
+    function openDrawer() {
+      drawer.classList.remove('drawer-closed');
+      drawerBackdrop.classList.remove('backdrop-hidden');
+      mobileMenuBtn.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('overflow-hidden');
+    }
+    function closeDrawer() {
+      drawer.classList.add('drawer-closed');
+      drawerBackdrop.classList.add('backdrop-hidden');
+      mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    mobileMenuBtn.addEventListener('click', openDrawer);
+    drawerCloseBtn.addEventListener('click', closeDrawer);
+    drawerBackdrop.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+    drawer.querySelectorAll('.drawer-link').forEach(link => link.addEventListener('click', closeDrawer));
 
     // Call button press feedback
     document.querySelectorAll('a[href^="tel:"]').forEach(btn => {
@@ -1049,6 +1128,22 @@
       revealEls.forEach(el => io.observe(el));
     } else {
       revealEls.forEach(el => el.classList.add('is-visible'));
+    }
+
+    // Scrollspy: highlight the nav link for the section in view
+    const navLinks = document.querySelectorAll('.nav-link[data-nav-link]');
+    const spySections = Array.from(navLinks)
+      .map(link => document.getElementById(link.dataset.navLink))
+      .filter(Boolean);
+    if ('IntersectionObserver' in window && spySections.length) {
+      const spyIo = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            navLinks.forEach(link => link.classList.toggle('active', link.dataset.navLink === entry.target.id));
+          }
+        });
+      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+      spySections.forEach(section => spyIo.observe(section));
     }
 
     // FAQ accordion
